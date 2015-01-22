@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from EdgeCalApp.models import User, Commitment
+
+admin.site.register(User)
+admin.site.register(Commitment)
