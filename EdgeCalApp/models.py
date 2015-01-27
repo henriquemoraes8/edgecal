@@ -10,16 +10,6 @@ class Calendar(models.Model):
     def mode_month(self):
         pass
 
-class User(models.Model):
-    name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    phone_number = models.CharField(max_length=20)
-    email = models.EmailField()
-    calendar = AutoOneToOneField(Calendar, primary_key = True)
-
-    def __str__(self):
-        return self.name + self.last_name
-
 class Visibility(models.Model):
     def get_rule_for_user(self, user):
         pass
