@@ -31,7 +31,7 @@ class CalendarUser(models.Model):
     user = models.OneToOneField(User)
 
 class Event(models.Model):
-    creator = models.ForeignKey(CalendarUser) # M Events --> 1 Creator
+    creator = models.ForeignKey(CalendarUser, related_name='creator', primary_key=True) # M Events --> 1 Creator
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     location = models.CharField(max_length=40, blank = True)
@@ -40,7 +40,7 @@ class Event(models.Model):
     repetition_end_date = models.DateField() 
     public_access_level = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
 
-    members = models.ManyToManyField(User, through='IsAttending', through_fields=('user', 'event'))
+    members = models.ManyToManyField(CalendarUser, through='IsAttending', through_fields=('event', 'user'))
     #repetition_scheme = models.ManyToManyField(Weekday, through='EventRepeatsOn', through_fields=('event', 'weekday'))
 
     # TODO: Make notes its own class?
