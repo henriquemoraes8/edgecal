@@ -31,7 +31,7 @@ class CalendarUser(models.Model):
     user = models.OneToOneField(User)
 
 class Event(models.Model):
-    creator = models.ForeignKey(CalendarUser, related_name='creator', primary_key=True) # M Events --> 1 Creator
+    creator = models.ForeignKey(CalendarUser, related_name='creator') # M Events --> 1 Creator
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     location = models.CharField(max_length=40, blank = True)
