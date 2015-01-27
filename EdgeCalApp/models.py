@@ -61,6 +61,10 @@ class HasAccess(models.Model):
     event = models.ForeignKey(Event)
     visibility = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
 
+class Rule(models.Model):
+    priority = models.IntegerField(default = 0)
+    status = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
+
 class Alert(models.Model):
     alert_date = models.DateField()
     event = models.ForeignKey(Event)
