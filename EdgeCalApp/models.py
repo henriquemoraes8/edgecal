@@ -1,30 +1,26 @@
 from django.db import models
 from django_enumfield import enum
 from annoying.fields import AutoOneToOneField
+from django.contrib.auth.models import User
 
-class Calendar(models.Model):
-    def mode_day(self):
-        pass
-    def mode_week(self):
-        pass
-    def mode_month(self):
-        pass
-
-class Visibility(models.Model):
-    def get_rule_for_user(self, user):
-        pass
-    def get_rule_for_group(self, group):
-        pass
+class CalendarUser(models.Model):
+    # TODO: Add any additional attributes for users
+    user = models.OneToOneField(User)
 
 class Event(models.Model):
+    creator = models.ForeignKey(CalendarUser) # M Events --> 1 Creator
     event_date = models.DateField()
-    calendar = models.ForeignKey(Calendar)
     location = models.CharField(max_length=40, blank = True)
     event_description = models.CharField(max_length=100, blank = True)
-    visibility = models.OneToOneField(Visibility);
+    #visibility = models.OneToOneField(Visibility);
+    # repetition = something
 
     def __str__(self):
         return self.commitment_description
+    
+class IsAttending(models.Model):
+    user = models.ForeignKey(CalendarUser)
+    event = models.ForeignKey(Event)
 
 class VisibilityStatus(enum.Enum):
     PRIVATE = 0
@@ -34,7 +30,7 @@ class VisibilityStatus(enum.Enum):
 
 class Rule(models.Model):
     priority = models.IntegerField(default = 0)
-    visibility = models.ForeignKey(Visibility)
+    # visibility = models.ForeignKey(Visibility)
     status = enum.EnumField(VisibilityStatus, default = VisibilityStatus.PRIVATE)
 
 class Alert(models.Model):
