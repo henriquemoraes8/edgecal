@@ -3,17 +3,47 @@ from django_enumfield import enum
 from annoying.fields import AutoOneToOneField
 from django.contrib.auth.models import User
 
+##############
+# Enumerations
+##############
+
+class Weekday(enum.Enum):
+    SUNDAY = 0
+    MONDAY = 1
+    TUESDAY = 2
+    WEDNESDAY = 3
+    THURSDAY = 4
+    FRIDAY = 5
+    SATURDAY = 6
+    
+class AccessLevel(enum.Enum):
+    PRIVATE = 0
+    BUSY = 1
+    VISIBLE = 2
+    MODIFY = 3
+    
+##############
+# Database Entities
+##############
+
 class CalendarUser(models.Model):
     # TODO: Add any additional attributes for users
     user = models.OneToOneField(User)
 
 class Event(models.Model):
     creator = models.ForeignKey(CalendarUser) # M Events --> 1 Creator
-    event_date = models.DateField()
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
     location = models.CharField(max_length=40, blank = True)
-    event_description = models.CharField(max_length=100, blank = True)
-    #visibility = models.OneToOneField(Visibility);
-    # repetition = something
+    event_description = models.CharField(max_length=140, blank = True)
+    notes = models.CharField(max_length=500, blank = True)
+    repetition_end_date = models.DateField() 
+    public_access_level = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
+
+    members = models.ManyToManyField(User, through='IsAttending', through_fields=('user', 'event'))
+    repetition_scheme = models.ManyToManyField(Weekday, through='EventRepeatsOn', through_fields=('event', 'weekday'))
+
+    # TODO: Make notes its own class?
 
     def __str__(self):
         return self.commitment_description
@@ -21,17 +51,15 @@ class Event(models.Model):
 class IsAttending(models.Model):
     user = models.ForeignKey(CalendarUser)
     event = models.ForeignKey(Event)
+    
+class EventRepeatsOn(models.Model):
+    event = models.ForeignKey(Event)
+    weekday = models.ForeignKey(Weekday)
 
-class VisibilityStatus(enum.Enum):
-    PRIVATE = 0
-    BUSY = 1
-    VISIBLE = 2
-    MODIFY = 3
-
-class Rule(models.Model):
-    priority = models.IntegerField(default = 0)
-    # visibility = models.ForeignKey(Visibility)
-    status = enum.EnumField(VisibilityStatus, default = VisibilityStatus.PRIVATE)
+class HasAccess(models.Model):
+    user = models.ForeignKey(CalendarUser)
+    event = models.ForeignKey(Event)
+    visibility = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
 
 class Alert(models.Model):
     alert_date = models.DateField()
