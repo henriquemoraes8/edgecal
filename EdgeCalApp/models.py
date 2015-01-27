@@ -41,7 +41,7 @@ class Event(models.Model):
     public_access_level = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
 
     members = models.ManyToManyField(User, through='IsAttending', through_fields=('user', 'event'))
-    repetition_scheme = models.ManyToManyField(Weekday, through='EventRepeatsOn', through_fields=('event', 'weekday'))
+    #repetition_scheme = models.ManyToManyField(Weekday, through='EventRepeatsOn', through_fields=('event', 'weekday'))
 
     # TODO: Make notes its own class?
 
@@ -52,9 +52,9 @@ class IsAttending(models.Model):
     user = models.ForeignKey(CalendarUser)
     event = models.ForeignKey(Event)
     
-class EventRepeatsOn(models.Model):
-    event = models.ForeignKey(Event)
-    weekday = models.ForeignKey(Weekday)
+#class EventRepeatsOn(models.Model):
+#    event = models.ForeignKey(Event)
+#    weekday = models.ForeignKey(Weekday)
 
 class HasAccess(models.Model):
     user = models.ForeignKey(CalendarUser)
