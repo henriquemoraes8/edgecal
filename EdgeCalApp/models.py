@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django_enumfield import enum
 from annoying.fields import AutoOneToOneField
 from django.contrib.auth.models import User
@@ -17,8 +18,11 @@ class WeekdayEnum(enum.Enum):
     FRIDAY = 5
     SATURDAY = 6
     
-class Weekday(models.Model):
-    day = enum.EnumField(WeekdayEnum, default = Null)
+class RepeatPeriod(enum.Enum):
+    DAILY = 0
+    WEEKLY = 1
+    MONTHLY = 2
+    YEARLY = 3
     
 class AccessLevel(enum.Enum):
     PRIVATE = 0
@@ -31,6 +35,13 @@ class InvitationStatus(enum.Enum):
     DECLINED = 1
     MAYBE = 2
     ATTENDING = 3
+    
+class AlertType(enum.Enum):
+    INVITATION = 0
+    REMINDER = 1
+    RESPONSE = 2
+    EVENT_TIME_CHANGE = 3
+    EVENT_LOCATION_CHANGE = 4
 
 
 ##############
@@ -52,6 +63,10 @@ class CalendarUser(models.Model):
     def __str__(self):
         return self.commitment_description
 
+class RepititionScheme(models.Model):
+    day = enum.EnumField(WeekdayEnum, default = Null)
+    repeat_period = enum.EnumField(RepeatPeriod, default = RepeatPeriod.WEEKLY)
+
 # Design Note: Should we rename this something like 'Entry' ?  What if we want to add
 # more general 'tasks' later? I feel like a lot of this could be recycled...
 
@@ -66,7 +81,8 @@ class Event(models.Model):
     public_access_level = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
 
     guest_list = models.ManyToManyField(CalendarUser, through='IsInvited', through_fields=('event', 'user'))
-    repetition_scheme = models.ManyToManyField(Weekday)
+    # access_list = models.ManyToManyField(CalendarUser, through='HasAccess', through_fields=('event', 'user'))
+    repetition_scheme = models.ManyToManyField(RepititionScheme)
     
     events = models.Manager()
     
@@ -74,6 +90,7 @@ class Event(models.Model):
         ordering = ["start_date_time"]
         verbose_name_plural = "Events"
 
+    # TODO: Implement the visibility restrictions
     # TODO: Specify widgets to be used for each field
     # TODO: Make notes its own class?
 
@@ -106,6 +123,7 @@ class Rule(models.Model):
     status = enum.EnumField(AccessLevel, default = AccessLevel.PRIVATE)
 
 class Alert(models.Model):
+    alert_type = enum.EnumField(AlertType, default = AlertType.REMINDER)
     alert_date = models.DateField()
     event = models.ForeignKey(Event)
 
