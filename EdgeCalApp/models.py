@@ -3,7 +3,6 @@ from django.conf import settings
 from django_enumfield import enum
 from annoying.fields import AutoOneToOneField
 from django.contrib.auth.models import User
-from codetools.util.cbook import Null
 
 ##############
 # Enumerations
@@ -64,7 +63,7 @@ class CalendarUser(models.Model):
         return self.commitment_description
 
 class RepititionScheme(models.Model):
-    day = enum.EnumField(WeekdayEnum, default = Null)
+    day = enum.EnumField(WeekdayEnum, default = None)
     repeat_period = enum.EnumField(RepeatPeriod, default = RepeatPeriod.WEEKLY)
 
 # Design Note: Should we rename this something like 'Entry' ?  What if we want to add
